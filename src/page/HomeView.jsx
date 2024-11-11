@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import NavbarTailwind from "../components/navbar/NavbarTailwind";
 
 const HomeView = () => {
   //store data secara state react nya
@@ -17,21 +18,42 @@ const HomeView = () => {
   const fetchShops = async (stock = "", productName = "") => {
     setLoading(true);
     try {
+      const token = localStorage.getItem("token");
+
       let response;
       if (productName && stock) {
         response = await axios.get(
-          `http://localhost:3000/api/v1/shops?productName=${productName}&stock=${stock}`
+          `http://localhost:3000/api/v1/shops?productName=${productName}&stock=${stock}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
       } else if (stock) {
         response = await axios.get(
-          `http://localhost:3000/api/v1/shops?stock=${stock}`
+          `http://localhost:3000/api/v1/shops?stock=${stock}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
       } else if (productName) {
         response = await axios.get(
-          `http://localhost:3000/api/v1/shops?productName=${productName}`
+          `http://localhost:3000/api/v1/shops?productName=${productName}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
       } else {
-        response = await axios.get("http://localhost:3000/api/v1/shops");
+        response = await axios.get("http://localhost:3000/api/v1/shops", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
       }
       console.log(response.data.data);
 
@@ -56,29 +78,7 @@ const HomeView = () => {
 
   return (
     <>
-      <header className="flex justify-between p-4 bg-white shadow-md">
-        <div className="flex items-center space-x-4">
-          <h1 className="text-lg font-bold text-blue-800">Binar Car Rental</h1>
-          <nav className="hidden md:flex space-x-4">
-            <a href="#" className="text-gray-700">
-              Our Services
-            </a>
-            <a href="#" className="text-gray-700">
-              Why Us
-            </a>
-            <a href="#" className="text-gray-700">
-              Testimonial
-            </a>
-            <a href="#" className="text-gray-700">
-              FAQ
-            </a>
-          </nav>
-        </div>
-        <button className="px-4 py-2 text-white bg-green-500 rounded-md">
-          Register
-        </button>
-      </header>
-
+      <NavbarTailwind />
       <div>
         <form onSubmit={handleFilter}>
           <div class="text-left space-y-12 mt-10 mb-10">
@@ -139,36 +139,41 @@ const HomeView = () => {
       {loading && <p> loading... </p>}
       {error && <p className="text-red-500">{error}</p>}
       {!loading && !error && (
-        <section className="max-w-6xl mx-auto mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {" "}
-          {shops.map((shop, index) => (
-            <div
-              key={index}
-              className="p-4 border rounded-md bg-white shadow-md"
-            >
-              {" "}
-              <img
-                src={shop.products[0].images[0]}
-                alt={shop.products[0].name}
-                className="w-full h-40 object-cover mb-4"
-              />{" "}
-              <h3 className="font-semibold">{shop.products[0].name}</h3>{" "}
-              <p className="text-green-500 font-bold">
-                Rp. {shop.products[0].price}
-              </p>{" "}
-              <p className="text-gray-600 mt-2 text-sm">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-              </p>{" "}
-              <div className="flex items-center justify-between text-gray-500 text-sm mt-4">
-                {" "}
-                <span>{shop.products[0].stock}</span> <span>Manual</span>{" "}
-                <span>Tahun 2020</span>{" "}
-              </div>{" "}
-              <button className="w-full px-4 py-2 mt-4 text-white bg-green-500 rounded-md">
-                Pilih Mobil
-              </button>{" "}
+        <section className="max-w-6xl mx-auto mt-12 ">
+          {shops.length === 0 ? (
+            <p className="text-gray-500">No Data Available</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {shops.map((shop, index) => (
+                <div
+                  key={index}
+                  className="p-4 border rounded-md bg-white shadow-md"
+                >
+                  {" "}
+                  <img
+                    src={shop.products[0].images[0]}
+                    alt={shop.products[0].name}
+                    className="w-full h-40 object-cover mb-4"
+                  />{" "}
+                  <h3 className="font-semibold">{shop.products[0].name}</h3>{" "}
+                  <p className="text-green-500 font-bold">
+                    Rp. {shop.products[0].price}
+                  </p>{" "}
+                  <p className="text-gray-600 mt-2 text-sm">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                  </p>{" "}
+                  <div className="flex items-center justify-between text-gray-500 text-sm mt-4">
+                    {" "}
+                    <span>{shop.products[0].stock}</span> <span>Manual</span>{" "}
+                    <span>Tahun 2020</span>{" "}
+                  </div>{" "}
+                  <button className="w-full px-4 py-2 mt-4 text-white bg-green-500 rounded-md">
+                    Pilih Mobil
+                  </button>{" "}
+                </div>
+              ))}
             </div>
-          ))}{" "}
+          )}{" "}
         </section>
       )}
     </>
